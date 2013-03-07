@@ -5,21 +5,22 @@ How it works
 
 ubackup works right out of the box and merely uses the following tools:
 
-    cut
-    date
-    echo
-    find
-    grep
-    hostname
-    mount
-    sh
-    split
-    tar
-    umount
-    uname
-    which
-    gzip
-    xz
+	apt-get
+	cut
+	date
+	echo
+	find
+	grep
+	gzip
+	hostname
+	mount
+	sh
+	split
+	tar
+	umount
+	uname
+	which
+	p7zip
 
 It detects error/misconfiguration (wrong $PATH, wrong commands, wrong exclude list, overwriting existing files …). After checking that everything is set up the script will provide you with four options:
 
@@ -39,37 +40,45 @@ It detects error/misconfiguration (wrong $PATH, wrong commands, wrong exclude li
 	 
 	Option: 
 
+
 # Parameters
 
 The script only shows errors on stdout per default. If you want to run the backup in verbose mode and watch the files processed by tar, call the script like this:
 
-	$ ./ubackup.sh --verbose
-	$ ./ubackup.sh -v
+	$ ./uBackup --verbose
+	$ ./uBackup -v
 
 If you intend to backup your system on a cd/dvd with a predefined size call the script like:
 
-	$ ./ubackup.sh --split
-	$ ./ubackup.sh -s
+	$ ./uBackup --split
+	$ ./uBackup -s
 
-Don't forget to adjust the $split_options variable, i.o. to set the desired chunk size. Default is 100MB.
+Don't forget to adjust the $split_options variable, i.o. to set the desired chunk size. Default is 300MB.
+
+Restore help text is avaible for users who are not an expert on command line, called by:
+
+	$ ./uBackup --help-restore
+	$ ./uBackup -hr
 
 Of course you may combine command line parameters in any way.
 
+
 # Features
 
-    works right out of the box.
-    checks if all the needed tools exist.
-    checks that any file/folder listed exists (no spelling errors).
-    names backups according to their hostname and the date it was created → unique, meaningful file name.
-    prevents the overwriting of a backup file created on the same day.
-    runs an integrity check after the uBackup has been created.
-    allows fine-tuning and easy change.
-    verbose mode.
-    command line option –split for splitting the tarball on the fly.
+	works right out of the box.
+	checks if all the needed tools exist.
+	checks that any file/folder listed exists (no spelling errors).
+	names backups according to their hostname and the date it was created → unique, meaningful file name.
+	prevents the overwriting of a backup file created on the same day.
+	runs an integrity check after the uBackup has been created.
+	allows fine-tuning and easy change.
+	verbose mode.
+	command line option –split for splitting the tarball on the fly.
+
 
 # How to customise
 
-As mentioned above there are several variables to customise. The script itself has a few comments which should get you started. You might want to change the location where the uBackup.tar.xz is put (currently /mnt/backups/uBackup), or you might not like the filename (hostname-uBackup-date.tar.xz), or you might think that the kernel sources are part of a minimal system backup and hence you won't exclude them (and so on) …
+As mentioned above there are several variables to customise. The script itself has a few comments which should get you started. You might want to change the location where the hostname-01.01.11.tar.xz is put (currently /mnt/backups/uBackup), or you might not like the filename (hostname-uBackup-date.tar.xz), or you might think that the kernel sources are part of a minimal system backup and hence you won't exclude them (and so on) …
 
 	$default_exclude_list: put any file/directory in here which is never needed nor wanted for a minimal system backup.
 	$default_exclude_pattern: exclude patterns for the $default_include_folders/files.
@@ -79,14 +88,16 @@ As mentioned above there are several variables to customise. The script itself h
 	$custom_exclude_list: files/folders which are subfolders of a folder listed in $custom_include_list which should NOT be included.
 	$custom_exclude_pattern: exclude patterns for the $custom_include_list.
 
+
 # Run it
 
-    $ chmod +x ubackup
-    $ ./ubackup
+	$ chmod +x uBackup
+	$ uBackup
 
 This will execute the script (you must be root to succesfully backup all folders).
 
 For available parameters see section Parameters.
+
 
 # Automating
 
@@ -97,9 +108,10 @@ If you like to run this script from a cron job create a file with the commands y
 
 Just write down the exact commands you enter if you do the backup yourself. Save the file and call the script
 
-	$ mkubackup.sh < file
+	$ uBackup < file
 
-# Restore information (uBackup --restore-help)
+
+# Restore information (uBackup --help-restore)
 
 	Boot off a live-cd and repartition your harddisks and create filesystems as necessary
 	(make sure you remove all remaining files of your to-be-intallation).
@@ -146,17 +158,19 @@ Just write down the exact commands you enter if you do the backup yourself. Save
 	 $ umount /mnt/ubuntu
 	 $ reboot
 
+
 # Re-assemble split-ed ubackup
 
 If you split your ubackup either with the command line parameter –split/-s or uncommented the split section within the script you need to re-assemble the split chunks if you intend to restore such a ubackup:
 
-	$ cat ubackup.tar.gz_* > ubackup.tar.gz
+	$ cat hostname-01.01.11.tar.gz_* > hostname-01.01.11.tar.gz
 
 or
 
-	$ cat ubackup.tar.xz_* > ubackup.tar.xz
+	$ cat hostname-01.01.11.tar.xz_* > hostname-01.01.11.tar.xz
 
-substitute ubackup.tar.gz/ubackup.tar.xz with your ubackup name.
+substitute hostname-01.01.11.tar.gz/hostname-01.01.11.tar.xz with your ubackup name.
+
 
 # Changelog
 
@@ -169,3 +183,4 @@ substitute ubackup.tar.gz/ubackup.tar.xz with your ubackup name.
 	added automated fix missing depencies ability
 	- for users who installed the script without using apt-get
 	added root rights check
+	added restore help test to the script

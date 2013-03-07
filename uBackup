@@ -49,13 +49,13 @@ done
  
 help="\nUsage:\n`basename $0` [[-v]|[--verbose]] [[-s]|[--split]] [[-rh]|[--restore-help]] \n\nTo run the script NOT in verbose mode comes in handy if you want to see only the errors that occur during the backup.\n"
 
-restorehelp="\nRestore information:\n\nBoot off a live-cd and repartition your harddisks and create filesystems as necessary\n(make sure you remove all remaining files of your to-be-intallation).\n\nIf you are stored the backup to CD or DVD\n $ umount /mnt/cdrom\n Now remove the live-cd and insert the cd with the Backup\n $ mkdir /mnt/backup\n $ mount /dev/cdrom /mnt/backup\n\nIf the uBackup files are stored to an other partition or media like USB mount this media\n $ mkdir /mnt/backup\n $ mount /dev/sdbX /mnt/backup\n Note: Replace sdbX by the Volume where the backup files are on\n\nNow we can start to restore the backup\n $ mkdir /mnt/ubuntu\n $ mount /dev/sdaX /mnt/ubuntu\n Note: Replace sdaX by the root partitions name\n $ mkdir /mnt/ubuntu/boot\n $ mount /dev/sdaX /mnt/ubuntu/boot\n Note: Replace sdaX by the boot partitions name\nChoice the right command, for an gzip compression (tar.gz file) use\n $ tar xzvpf /mnt/backup/host-uBackup-23.05.2011-custom.tar.gz -C /mnt/ubuntu/\nIf the backup is stored in 7zip format (tar.xz file) use\n $ tar xJvpf /mnt/backup/host-uBackup-23.05.2011-custom.tar.xz -C /mnt/ubuntu/\n $ mount -t proc none /mnt/ubuntu/proc\n $ mount -o bind /dev /mnt/ubuntu/dev\n $ chroot /mnt/ubuntu /bin/sh\n\nIf in need adjust necessary files (/etc/fstab, /boot/grub/grub.conf) and/or install grub\n $ apt-get update\n $ grub-install --no-floppy /dev/sdaX\n Note: Replace sdaX by the boot partitions name\n\nNow we are finished the restore, lets prepare for booting the system now \n $ exit\n $ cd /\n $ umount /mnt/cdrom\n Remove the backup cd\n $ umount /mnt/ubuntu/boot\n $ umount /mnt/ubuntu/dev\n $ umount /mnt/ubuntu/proc\n $ umount /mnt/ubuntu\n $ reboot\n"
+helprestore="\nRestore information:\n\nBoot off a live-cd and repartition your harddisks and create filesystems as necessary\n(make sure you remove all remaining files of your to-be-intallation).\n\nIf you are stored the backup to CD or DVD\n $ umount /mnt/cdrom\n Now remove the live-cd and insert the cd with the Backup\n $ mkdir /mnt/backup\n $ mount /dev/cdrom /mnt/backup\n\nIf the uBackup files are stored to an other partition or media like USB mount this media\n $ mkdir /mnt/backup\n $ mount /dev/sdbX /mnt/backup\n Note: Replace sdbX by the Volume where the backup files are on\n\nNow we can start to restore the backup\n $ mkdir /mnt/ubuntu\n $ mount /dev/sdaX /mnt/ubuntu\n Note: Replace sdaX by the root partitions name\n $ mkdir /mnt/ubuntu/boot\n $ mount /dev/sdaX /mnt/ubuntu/boot\n Note: Replace sdaX by the boot partitions name\nChoice the right command, for an gzip compression (tar.gz file) use\n $ tar xzvpf /mnt/backup/host-uBackup-23.05.2011-custom.tar.gz -C /mnt/ubuntu/\nIf the backup is stored in 7zip format (tar.xz file) use\n $ tar xJvpf /mnt/backup/host-uBackup-23.05.2011-custom.tar.xz -C /mnt/ubuntu/\n $ mount -t proc none /mnt/ubuntu/proc\n $ mount -o bind /dev /mnt/ubuntu/dev\n $ chroot /mnt/ubuntu /bin/sh\n\nIf in need adjust necessary files (/etc/fstab, /boot/grub/grub.conf) and/or install grub\n $ apt-get update\n $ grub-install --no-floppy /dev/sdaX\n Note: Replace sdaX by the boot partitions name\n\nNow we are finished the restore, lets prepare for booting the system now \n $ exit\n $ cd /\n $ umount /mnt/cdrom\n Remove the backup cd\n $ umount /mnt/ubuntu/boot\n $ umount /mnt/ubuntu/dev\n $ umount /mnt/ubuntu/proc\n $ umount /mnt/ubuntu\n $ reboot\n"
  
 # Defaults to creating one tarball
 tar_output="--file"
  
 # split command
-split_options="--suffix-length=1 --bytes=100m"
+split_options="--suffix-length=1 --bytes=300m"
  
 # options for the tar command
 tarOptions=" --preserve-permissions --create --absolute-names --totals --ignore-failed-read"
@@ -64,7 +64,7 @@ tarOptions=" --preserve-permissions --create --absolute-names --totals --ignore-
 uBackupLocation=/mnt/backup
  
 # name prefix
-uBackupprefix=`hostname`-backup-`date +\%d.\%m.\%Y`
+uBackupprefix=`hostname`-`date +\%d.\%m.\%Y`
  
 # patterns which should not be backed up (like iso files).
 # example: default_exclude_pattern="*.iso *.divx"
@@ -168,7 +168,7 @@ while [ $1 ]; do
         "-h" | "--help")
                 echo -e $help
                 exit 0;;
-        "-rh" | "--restore-help")
+        "-hr" | "--help-restore")
                 echo -e $restorehelp
                 exit 0;;
         "-v" | "--verbose")
@@ -182,8 +182,6 @@ while [ $1 ]; do
         esac
         shift
 done
- 
-echo ""
  
 # check folder/files listed in $default_exclude_list exist
 verify "$default_exclude_list" "\$default_exclude_list"
@@ -205,7 +203,7 @@ verify "$custom_exclude_list" "\$custom_exclude_list"
  echo -e "======================================================"
  
 # how do you want to backup?
-echo -e "\nHow do you want to backup? Make your choice...
+echo -e "How do you want to backup? Make your choice...
 (Use CTRL+C to abort)\n
 fast backup, medium compression (tar.gz):
  [1] Minimal
